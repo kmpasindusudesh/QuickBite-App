@@ -42,6 +42,10 @@ exports.createOrder = async (req, res) => {
             return res.status(400).json({ message: 'Please provide a valid totalAmount.' });
         }
 
+        if (!req.file) {
+            return res.status(400).json({ message: 'Payment slip image is required.' });
+        }
+
         // Payment slip image path — Multer eken save welanam path eka gannawa
         // req.file naththam blank string — slip optional
         let paymentSlip = '';

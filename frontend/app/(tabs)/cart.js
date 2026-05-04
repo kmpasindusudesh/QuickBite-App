@@ -164,6 +164,11 @@ export default function CartScreen() {
             return;
         }
 
+        if (!slipUri) {
+            Alert.alert('Payment Slip Required', 'Please upload a bank payment slip before confirming your order.');
+            return;
+        }
+
         // 3. Token check — login naththam redirect
         const token = await getToken();
         if (!token) {
@@ -186,13 +191,11 @@ export default function CartScreen() {
             formData.append('totalAmount', String(totalAmount));
             formData.append('restaurantId', restaurantId);
 
-            // Bank slip image — optional (slip select kala naththam skip)
-            if (slipUri) {
-                const fileName = slipUri.split('/').pop() || 'slip.jpg';
-                const ext      = (fileName.split('.').pop() || 'jpg').toLowerCase();
-                const mime     = ext === 'png' ? 'image/png' : 'image/jpeg';
-                formData.append('paymentSlip', { uri: slipUri, name: fileName, type: mime });
-            }
+            // Bank slip image — required
+            const fileName = slipUri.split('/').pop() || 'slip.jpg';
+            const ext      = (fileName.split('.').pop() || 'jpg').toLowerCase();
+            const mime     = ext === 'png' ? 'image/png' : 'image/jpeg';
+            formData.append('paymentSlip', { uri: slipUri, name: fileName, type: mime });
 
             // 5. POST /api/orders
             const res  = await fetch(`${API_BASE_URL}/orders`, {
@@ -339,9 +342,9 @@ export default function CartScreen() {
                     </View>
                 </View>
 
-                {/* ---- Bank Slip Upload (Optional) ---- */}
+                {/* ---- Bank Slip Upload (Required) ---- */}
                 <View style={styles.slipSection}>
-                    <Text style={styles.slipTitle}>Payment Slip (Optional)</Text>
+                    <Text style={styles.slipTitle}>Payment Slip (Required)</Text>
 
                     <TouchableOpacity
                         style={styles.slipPickBtn}

@@ -57,7 +57,7 @@ export default function CartScreen() {
     const [cartItems, setCartItems] = useState([]);
 
     // Payment slip image URI — user gallery eken select karanawa
-    const [slipUri, setSlipUri]     = useState(null);
+    const [slipUri, setSlipUri] = useState(null);
 
     // API call loading state — Confirm Order button disable karanawa
     const [submitting, setSubmitting] = useState(false);
@@ -184,7 +184,7 @@ export default function CartScreen() {
 
             // Items JSON string → FormData multipart body walata
             const itemsPayload = cartItems.map((it) => ({
-                foodId:   it.foodId,
+                foodId: it.foodId,
                 quantity: it.quantity,
             }));
             formData.append('items', JSON.stringify(itemsPayload));
@@ -193,12 +193,12 @@ export default function CartScreen() {
 
             // Bank slip image — required
             const fileName = slipUri.split('/').pop() || 'slip.jpg';
-            const ext      = (fileName.split('.').pop() || 'jpg').toLowerCase();
-            const mime     = ext === 'png' ? 'image/png' : 'image/jpeg';
+            const ext = (fileName.split('.').pop() || 'jpg').toLowerCase();
+            const mime = ext === 'png' ? 'image/png' : 'image/jpeg';
             formData.append('paymentSlip', { uri: slipUri, name: fileName, type: mime });
 
             // 5. POST /api/orders
-            const res  = await fetch(`${API_BASE_URL}/orders`, {
+            const res = await fetch(`${API_BASE_URL}/orders`, {
                 method: 'POST',
                 headers: { Authorization: `Bearer ${token}` },
                 // Content-Type set karanna epa — FormData eke boundary auto set wenawa

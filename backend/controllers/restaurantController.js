@@ -34,7 +34,7 @@ exports.createRestaurant = async (req, res) => {
 
         // 2. Required fields validate
         if (!name || !address) {
-            return res.status(400).json({ message: 'Name saha Address denna ona!' });
+            return res.status(400).json({ message: 'Name and address are required.' });
         }
 
         // 3. Logo image path — Multer file upload welanam path set; naththam blank
@@ -57,12 +57,12 @@ exports.createRestaurant = async (req, res) => {
 
         // 6. Success response + saved document return
         res.status(201).json({
-            message: 'Restaurant eka lassanata add una! 🏪',
+            message: 'Restaurant added successfully.',
             restaurant: saved
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Restaurant add weddi server eke aulk aawa.' });
+        res.status(500).json({ message: 'A server error occurred while adding the restaurant.' });
     }
 };
 
@@ -80,7 +80,7 @@ exports.getAllRestaurants = async (req, res) => {
         res.json(restaurants);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Restaurants gannata server eke aulk aawa.' });
+        res.status(500).json({ message: 'A server error occurred while retrieving restaurants.' });
     }
 };
 
@@ -96,20 +96,20 @@ exports.getRestaurantById = async (req, res) => {
 
         // 2. Valid ObjectId da check — invalid naththam DB query karanna epa
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ message: 'Restaurant ID eka valid naha!' });
+            return res.status(400).json({ message: 'The provided restaurant ID is invalid.' });
         }
 
         // 3. DB eken find karanawa
         const restaurant = await Restaurant.findById(id);
         if (!restaurant) {
-            return res.status(404).json({ message: 'Me ID eken restaurant ekak naha!' });
+            return res.status(404).json({ message: 'No restaurant was found for the provided ID.' });
         }
 
         // 4. Restaurant document return karanawa
         res.json(restaurant);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Restaurant gannata server eke aulk aawa.' });
+        res.status(500).json({ message: 'A server error occurred while retrieving the restaurant.' });
     }
 };
 
@@ -123,7 +123,7 @@ exports.updateRestaurant = async (req, res) => {
         // 1. URL eken id validate
         const { id } = req.params;
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ message: 'Restaurant ID eka valid naha!' });
+            return res.status(400).json({ message: 'The provided restaurant ID is invalid.' });
         }
 
         // 2. Body eken new values gannawa
@@ -132,7 +132,7 @@ exports.updateRestaurant = async (req, res) => {
         // 3. Existing restaurant find — id valid naththam naha message
         const existing = await Restaurant.findById(id);
         if (!existing) {
-            return res.status(404).json({ message: 'Me ID eken restaurant ekak naha!' });
+            return res.status(404).json({ message: 'No restaurant was found for the provided ID.' });
         }
 
         // 4. Logo path — file upload wunanam new path; naththam existing path keep
@@ -153,12 +153,12 @@ exports.updateRestaurant = async (req, res) => {
         const updated = await Restaurant.findByIdAndUpdate(id, updatedData, { returnDocument: 'after' });
 
         res.json({
-            message: 'Restaurant eka update una! ✅',
+            message: 'Restaurant updated successfully.',
             restaurant: updated
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Restaurant update weddi server eke aulk aawa.' });
+        res.status(500).json({ message: 'A server error occurred while updating the restaurant.' });
     }
 };
 
@@ -173,13 +173,13 @@ exports.deleteRestaurant = async (req, res) => {
         // 1. ID validate
         const { id } = req.params;
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ message: 'Restaurant ID eka valid naha!' });
+            return res.status(400).json({ message: 'The provided restaurant ID is invalid.' });
         }
 
         // 2. Restaurant DB eke thiyenawada check
         const restaurant = await Restaurant.findById(id);
         if (!restaurant) {
-            return res.status(404).json({ message: 'Me ID eken restaurant ekak naha!' });
+            return res.status(404).json({ message: 'No restaurant was found for the provided ID.' });
         }
 
         // 3. IMPORTANT: Food items linked nawada check
@@ -194,10 +194,10 @@ exports.deleteRestaurant = async (req, res) => {
         // 4. Safe to delete — no linked foods
         await Restaurant.findByIdAndDelete(id);
 
-        res.json({ message: 'Restaurant eka delete una! 🗑️' });
+        res.json({ message: 'Restaurant deleted successfully.' });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Restaurant delete weddi server eke aulk aawa.' });
+        res.status(500).json({ message: 'A server error occurred while deleting the restaurant.' });
     }
 };
 

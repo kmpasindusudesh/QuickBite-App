@@ -34,7 +34,7 @@ function riderKey(user) {
 exports.createDeliveryTask = async (req, res) => {
     try {
         if (req.user.role !== 'rider') {
-            return res.status(403).json({ message: 'Me endpoint eka rider kenek witharak!' });
+            return res.status(403).json({ message: 'This endpoint is accessible to riders only.' });
         }
 
         // orderId — req.body eken gannawa (frontend JSON.stringify({ orderId }) yawanawa)
@@ -43,12 +43,12 @@ exports.createDeliveryTask = async (req, res) => {
 
         if (!orderId) {
             return res.status(400).json({
-                message: "Body eke 'orderId' field eka thiyanama ona! { \"orderId\": \"...\" }",
+                message: "The request body must include an 'orderId' field. Example: { \"orderId\": \"...\" }",
             });
         }
         if (!mongoose.Types.ObjectId.isValid(String(orderId))) {
             return res.status(400).json({
-                message: `orderId eka valid MongoDB ObjectId ekak naha: '${orderId}'`,
+                message: `The provided orderId is not a valid MongoDB ObjectId: '${orderId}'`,
             });
         }
 
@@ -59,7 +59,7 @@ exports.createDeliveryTask = async (req, res) => {
         });
         if (existing) {
             return res.status(400).json({
-                message: 'Me order eka dan rider kenekta assign wela thiyenawa!',
+                message: 'This order has already been assigned to a rider.',
             });
         }
 
@@ -78,7 +78,7 @@ exports.createDeliveryTask = async (req, res) => {
         if (!order) {
             console.log('[createDeliveryTask] Order not found or not Ready/unassigned:', orderId);
             return res.status(400).json({
-                message: 'Me order eka dan Ready naha hari assign wela — accept karanna baha!',
+                message: 'This order is either not Ready or has already been assigned, so it cannot be accepted.',
             });
         }
 
@@ -96,12 +96,12 @@ exports.createDeliveryTask = async (req, res) => {
         const populated = await populateDelivery(Delivery.findById(delivery._id));
 
         return res.status(201).json({
-            message: 'Delivery task create una — delivery accept una! 🛵',
+            message: 'Delivery task created and accepted successfully.',
             delivery: populated,
         });
     } catch (error) {
         console.error('[createDeliveryTask] Error:', error);
-        res.status(500).json({ message: 'Delivery create weddi server eke aulk aawa.' });
+        res.status(500).json({ message: 'A server error occurred while creating the delivery task.' });
     }
 };
 
@@ -112,7 +112,7 @@ exports.createDeliveryTask = async (req, res) => {
 exports.getRiderDeliveries = async (req, res) => {
     try {
         if (req.user.role !== 'rider') {
-            return res.status(403).json({ message: 'Me endpoint eka rider kenek witharak!' });
+            return res.status(403).json({ message: 'This endpoint is accessible to riders only.' });
         }
 
         const list = await populateDelivery(
@@ -122,7 +122,7 @@ exports.getRiderDeliveries = async (req, res) => {
         return res.status(200).json(Array.isArray(list) ? list : []);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Deliveries gannata server eke aulk aawa.' });
+        res.status(500).json({ message: 'A server error occurred while retrieving deliveries.' });
     }
 };
 
@@ -135,37 +135,37 @@ exports.getRiderDeliveries = async (req, res) => {
 exports.updateDeliveryStatus = async (req, res) => {
     try {
         if (req.user.role !== 'rider') {
-            return res.status(403).json({ message: 'Me route eka rider witharak!' });
+            return res.status(403).json({ message: 'This route is accessible to riders only.' });
         }
 
         const { id } = req.params;
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ message: 'Valid delivery ID ekak denna!' });
+            return res.status(400).json({ message: 'Please provide a valid delivery ID.' });
         }
 
         const delivery = await Delivery.findById(id);
         if (!delivery) {
-            return res.status(404).json({ message: 'Me ID eken delivery ekak naha!' });
+            return res.status(404).json({ message: 'No delivery was found for the provided ID.' });
         }
         if (String(delivery.riderId) !== String(riderKey(req.user))) {
-            return res.status(403).json({ message: 'Oya ta me delivery update karanna permission naha!' });
+            return res.status(403).json({ message: 'You do not have permission to update this delivery.' });
         }
         if (delivery.status === 'Delivered') {
-            return res.status(400).json({ message: 'Delivered una deliveries edit karanna baha!' });
+            return res.status(400).json({ message: 'Delivered tasks cannot be modified.' });
         }
 
         const newStatus = req.body.status;
         const validStatuses = ['Assigned', 'Picked Up', 'On the Way', 'Delivered'];
         if (!newStatus || !validStatuses.includes(newStatus)) {
             return res.status(400).json({
-                message: `Status eka Assigned, Picked Up, On the Way, hari Delivered witharak denna ona!`,
+                message: `Status must be one of: Assigned, Picked Up, On the Way, or Delivered.`,
             });
         }
 
         // Delivered status → file ona
         if (newStatus === 'Delivered' && !req.file) {
             return res.status(400).json({
-                message: "Delivered karanna kalin delivery proof photo ekak upload karanna ona!",
+                message: "A delivery proof photo is required before marking this task as Delivered.",
             });
         }
 
@@ -202,12 +202,12 @@ exports.updateDeliveryStatus = async (req, res) => {
 
         const populated = await populateDelivery(Delivery.findById(delivery._id));
         return res.json({
-            message: `Delivery status '${newStatus}' ekata update una! ✅`,
+            message: `Delivery status updated successfully to '${newStatus}'.`,
             delivery: populated,
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Delivery update weddi server eke aulk aawa.' });
+        res.status(500).json({ message: 'A server error occurred while updating delivery status.' });
     }
 };
 
@@ -218,24 +218,24 @@ exports.updateDeliveryStatus = async (req, res) => {
 exports.cancelDeliveryTask = async (req, res) => {
     try {
         if (req.user.role !== 'rider') {
-            return res.status(403).json({ message: 'Me route eka rider witharak!' });
+            return res.status(403).json({ message: 'This route is accessible to riders only.' });
         }
 
         const { id } = req.params;
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ message: 'Valid delivery ID ekak denna!' });
+            return res.status(400).json({ message: 'Please provide a valid delivery ID.' });
         }
 
         const delivery = await Delivery.findById(id);
         if (!delivery) {
-            return res.status(404).json({ message: 'Me ID eken delivery ekak naha!' });
+            return res.status(404).json({ message: 'No delivery was found for the provided ID.' });
         }
         if (String(delivery.riderId) !== String(riderKey(req.user))) {
-            return res.status(403).json({ message: 'Oya ta me delivery cancel karanna permission naha!' });
+            return res.status(403).json({ message: 'You do not have permission to cancel this delivery.' });
         }
         if (['On the Way', 'Delivered'].includes(delivery.status)) {
             return res.status(400).json({
-                message: `Delivery eka '${delivery.status}' stage eke thiyenawa — dan cancel karanna baha!`,
+                message: `This delivery is already in '${delivery.status}' status and can no longer be cancelled.`,
             });
         }
 
@@ -247,11 +247,11 @@ exports.cancelDeliveryTask = async (req, res) => {
         await Delivery.findByIdAndDelete(id);
 
         return res.json({
-            message: 'Delivery cancel una — order eka ayin Ready pool ekata awa. 🔄',
+            message: 'Delivery cancelled successfully. The order has been returned to the Ready pool.',
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Delivery cancel weddi server eke aulk aawa.' });
+        res.status(500).json({ message: 'A server error occurred while cancelling the delivery.' });
     }
 };
 
@@ -286,7 +286,7 @@ exports.assignOrderToRider = async (orderId, riderObjectId) => {
 exports.getActiveDeliveryTask = async (req, res) => {
     try {
         if (req.user.role !== 'rider') {
-            return res.status(403).json({ message: 'Me endpoint eka rider kenek witharak!' });
+            return res.status(403).json({ message: 'This endpoint is accessible to riders only.' });
         }
 
         const rk = riderKey(req.user);
@@ -298,6 +298,6 @@ exports.getActiveDeliveryTask = async (req, res) => {
         return res.status(200).json(list.length ? [list[0].orderId].filter(Boolean) : []);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Active task gannata server eke aulk aawa.' });
+        res.status(500).json({ message: 'A server error occurred while retrieving the active task.' });
     }
 };

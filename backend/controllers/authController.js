@@ -36,13 +36,13 @@ exports.register = async (req, res) => {
 
         // 2. Phone denna thibboth 10-digit check
         if (phone && !/^\d{10}$/.test(phone)) {
-            return res.status(400).json({ message: "Phone number eka exactly 10 digits thiyanama ona!" });
+            return res.status(400).json({ message: "Phone number must contain exactly 10 digits." });
         }
 
         // 3. Email duplicate check — eka email eken eka account ekai
         const userExists = await User.findOne({ email });
         if (userExists) {
-            return res.status(400).json({ message: "Me email eka danatamath pawichchi karanawa!" });
+            return res.status(400).json({ message: "This email address is already in use." });
         }
 
         // 4. Password hash karanawa — plain text DB ekata yanna baha
@@ -63,11 +63,11 @@ exports.register = async (req, res) => {
         await newUser.save();
 
         // 7. Success response — token dennawa naha (register eka witirak; login karanna ona)
-        res.status(201).json({ message: "User lassanata register una! 🎉" });
+        res.status(201).json({ message: "User registered successfully." });
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Server eke podi aulk, ayeth try karanna." });
+        res.status(500).json({ message: "A server error occurred. Please try again." });
     }
 };
 
@@ -86,14 +86,14 @@ exports.login = async (req, res) => {
         // 2. Email database eke thiyenawada balanawa
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(400).json({ message: "Me email eken hadapu account ekak naha!" });
+            return res.status(400).json({ message: "No account was found for this email address." });
         }
 
         // 3. Password compare — plain text vs stored hash
         // bcrypt.compare plain text eka hash ekakata compare karanawa (secret reveal naha)
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(400).json({ message: "Password eka waradiy!" });
+            return res.status(400).json({ message: "Incorrect password." });
         }
 
         // 4. JWT token eka create karanawa
@@ -109,7 +109,7 @@ exports.login = async (req, res) => {
         // 5. Token + user info frontend ekata yawanawa
         // Frontend AsyncStorage eke save karanawa (storage.js eke saveToken / saveUser)
         res.json({
-            message: "Login sarthakai! 🎉",
+            message: "Login successful.",
             token: token,
             user: {
                 id: user._id,
@@ -122,7 +122,7 @@ exports.login = async (req, res) => {
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Server eke podi aulk, ayeth try karanna." });
+        res.status(500).json({ message: "A server error occurred. Please try again." });
     }
 };
 
@@ -137,7 +137,7 @@ exports.getProfile = async (req, res) => {
         // .select('-password') — password field return karanna epa (security!)
         const user = await User.findById(req.user.id).select('-password');
         if (!user) {
-            return res.status(404).json({ message: "User eka naha!" });
+            return res.status(404).json({ message: "User not found." });
         }
 
         // 2. Full user object return (password naththama)
@@ -162,12 +162,12 @@ exports.updateUser = async (req, res) => {
 
         // 2. Name + email required validation
         if (!name || !email) {
-            return res.status(400).json({ message: "Name saha Email denna ona!" });
+            return res.status(400).json({ message: "Name and email are required." });
         }
 
         // 3. Phone validate — blank eka valid (clear phone); filled naththam 10 digits ona
         if (phone !== undefined && phone !== '' && !/^\d{10}$/.test(phone)) {
-            return res.status(400).json({ message: "Phone number eka exactly 10 digits thiyanama ona!" });
+            return res.status(400).json({ message: "Phone number must contain exactly 10 digits." });
         }
 
         // 4. Email duplicate check — wenath kenek me email use karanawada? (mage account nathara)
@@ -176,7 +176,7 @@ exports.updateUser = async (req, res) => {
             _id: { $ne: req.user.id } // $ne = "not equal" — me user eka exclude karanawa
         });
         if (emailTaken) {
-            return res.status(400).json({ message: "Me email eka wenath account ekakata thiyenawa!" });
+            return res.status(400).json({ message: "This email address is already associated with another account." });
         }
 
         // 5. Update object hadanawa — phone field optional
@@ -195,18 +195,18 @@ exports.updateUser = async (req, res) => {
         ).select('-password'); // Password return karanna epa
 
         if (!updatedUser) {
-            return res.status(404).json({ message: "User eka naha!" });
+            return res.status(404).json({ message: "User not found." });
         }
 
         // 7. Success response
         res.json({
-            message: "Profile eka lassanata update una! ✅",
+            message: "Profile updated successfully.",
             user: updatedUser
         });
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Update weddi server eke aulk aawa." });
+        res.status(500).json({ message: "A server error occurred while updating the profile." });
     }
 };
 
@@ -220,14 +220,14 @@ exports.deleteUser = async (req, res) => {
         // 1. JWT eke user id eken DB eken find + delete
         const deleted = await User.findByIdAndDelete(req.user.id);
         if (!deleted) {
-            return res.status(404).json({ message: "User eka naha!" });
+            return res.status(404).json({ message: "User not found." });
         }
 
         // 2. Success — frontend logout karanna ona (token still valid 1d — AsyncStorage clear karanna ona)
-        res.json({ message: "Account eka delete una. 🗑️" });
+        res.json({ message: "Account deleted successfully." });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Delete weddi server eke aulk aawa." });
+        res.status(500).json({ message: "A server error occurred while deleting the account." });
     }
 };
 
@@ -241,7 +241,7 @@ exports.uploadProfilePic = async (req, res) => {
     try {
         // 1. File upload wunada check — Multer filter reject kala naththam req.file naha
         if (!req.file) {
-            return res.status(400).json({ message: "Photo ekak thorala naha!" });
+            return res.status(400).json({ message: "No photo was selected." });
         }
 
         // 2. Relative path hadanawa — "uploads/filename.jpg" wage
@@ -258,13 +258,13 @@ exports.uploadProfilePic = async (req, res) => {
 
         // 4. Success — frontend SERVER_URL + '/' + profilePic eken image URL hadanawa
         res.json({
-            message: "Profile photo eka lassanata upload una! 📸",
+            message: "Profile photo uploaded successfully.",
             user: updatedUser
         });
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Photo eka upload weddi aulk aawa." });
+        res.status(500).json({ message: "A server error occurred while uploading the photo." });
     }
 };
 

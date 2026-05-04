@@ -59,7 +59,7 @@ exports.getReviews = async (req, res) => {
         return res.status(200).json(reviews);
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: 'Reviews gannata server eke aulk aawa.' });
+        return res.status(500).json({ message: 'A server error occurred while retrieving reviews.' });
     }
 };
 
@@ -78,7 +78,7 @@ exports.createReview = async (req, res) => {
         // 2. Rating validate — 1 idan 5 dakwa valid
         const ratingNum = Number(rating);
         if (!rating || Number.isNaN(ratingNum) || ratingNum < 1 || ratingNum > 5) {
-            return res.status(400).json({ message: 'Rating eka 1 idan 5 dakwa denna ona!' });
+            return res.status(400).json({ message: 'Rating must be between 1 and 5.' });
         }
 
         // 3. foodId optional handling
@@ -88,13 +88,13 @@ exports.createReview = async (req, res) => {
         if (hasFood) {
             // 3a. foodId valid ObjectId da check
             if (!mongoose.Types.ObjectId.isValid(String(foodId))) {
-                return res.status(400).json({ message: 'foodId valid naha!' });
+                return res.status(400).json({ message: 'The provided foodId is invalid.' });
             }
 
             // 3b. Food DB eke thiyenawada check
             const food = await Food.findById(foodId);
             if (!food) {
-                return res.status(404).json({ message: 'Me food item eka naha!' });
+                return res.status(404).json({ message: 'No food item was found for the provided foodId.' });
             }
             foodIdToSave = foodId;
 
@@ -130,12 +130,12 @@ exports.createReview = async (req, res) => {
             .populate('foodId', 'name');
 
         return res.status(201).json({
-            message: 'Review eka lassanata add una! ⭐',
+            message: 'Review submitted successfully.',
             review:  populated,
         });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: 'Feedback add weddi server eke aulk aawa.' });
+        return res.status(500).json({ message: 'A server error occurred while submitting feedback.' });
     }
 };
 
@@ -151,20 +151,20 @@ exports.updateReview = async (req, res) => {
 
         // 2. Valid ObjectId da check
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ message: 'Valid review ID ekak denna!' });
+            return res.status(400).json({ message: 'Please provide a valid review ID.' });
         }
 
         // 3. Review DB eke find
         const review = await Review.findById(id);
         if (!review) {
-            return res.status(404).json({ message: 'Me review eka naha!' });
+            return res.status(404).json({ message: 'Review not found.' });
         }
 
         // 4. Owner check — JWT eke user id == review.userId da?
         // String() convert — ObjectId vs string mismatch avoid
         const jwtUserId = String(req.user?.id || req.user?._id || '');
         if (String(review.userId) !== jwtUserId) {
-            return res.status(403).json({ message: 'Oyage review eka witharak update karanna puluwan!' });
+            return res.status(403).json({ message: 'You are only authorized to update your own review.' });
         }
 
         // 5. Rating validate — update naththam existing keep
@@ -172,7 +172,7 @@ exports.updateReview = async (req, res) => {
         const ratingNum =
             rating !== undefined && rating !== '' ? Number(rating) : review.rating;
         if (Number.isNaN(ratingNum) || ratingNum < 1 || ratingNum > 5) {
-            return res.status(400).json({ message: 'Rating eka 1 idan 5 dakwa denna ona!' });
+            return res.status(400).json({ message: 'Rating must be between 1 and 5.' });
         }
 
         // 6. Image — new file upload naththam existing image path keep
@@ -194,12 +194,12 @@ exports.updateReview = async (req, res) => {
             .populate('foodId', 'name');
 
         return res.json({
-            message: 'Review eka update una! ✅',
+            message: 'Review updated successfully.',
             review:  updated,
         });
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: 'Review update weddi server eke aulk aawa.' });
+        return res.status(500).json({ message: 'A server error occurred while updating the review.' });
     }
 };
 

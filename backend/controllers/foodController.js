@@ -38,13 +38,13 @@ async function resolveRestaurantId(restaurantIdRaw) {
 
     // 3. Valid MongoDB ObjectId format da check (24-char hex)
     if (!mongoose.Types.ObjectId.isValid(idStr)) {
-        return { error: 'restaurantId eka valid MongoDB ID ekak naha!' };
+        return { error: 'The provided restaurantId is not a valid MongoDB ObjectId.' };
     }
 
     // 4. DB eke actually thiyanawada check — ID valid naththam restaurant naha puluwan
     const found = await Restaurant.findById(idStr);
     if (!found) {
-        return { error: 'Me restaurant ID eken database eke restaurant ekak naha!' };
+        return { error: 'No restaurant was found for the provided restaurantId.' };
     }
 
     // 5. Valid ObjectId string return — Food schema cast karanawa
@@ -65,13 +65,13 @@ exports.addFood = async (req, res) => {
 
         // 2. Required field validation
         if (!name || price === undefined || price === '' || !category) {
-            return res.status(400).json({ message: "Name, Price, Category denna ona!" });
+            return res.status(400).json({ message: "Name, price, and category are required." });
         }
 
         // 3. Price numeric validation — negative / NaN allow naha
         const priceNum = Number(price);
         if (Number.isNaN(priceNum) || priceNum < 0) {
-            return res.status(400).json({ message: "Price eka valid number ekak denna!" });
+            return res.status(400).json({ message: "Please provide a valid numeric price." });
         }
 
         // 4. restaurantId validate — Member 2 restaurant ekata link
@@ -107,12 +107,12 @@ exports.addFood = async (req, res) => {
 
         // 9. Success response
         res.status(201).json({
-            message: "Food item eka lassanata add una! 🍔",
+            message: "Food item added successfully.",
             food: foodWithRestaurant
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Food item add weddi server eke aulk aawa." });
+        res.status(500).json({ message: "A server error occurred while adding the food item." });
     }
 };
 
@@ -134,7 +134,7 @@ exports.getAllFoods = async (req, res) => {
         res.json(foods);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Food items gannata server eke aulk aawa." });
+        res.status(500).json({ message: "A server error occurred while retrieving food items." });
     }
 };
 
@@ -152,7 +152,7 @@ exports.updateFood = async (req, res) => {
         // 2. Existing food find — id naha naththam 404
         const existingFood = await Food.findById(req.params.id);
         if (!existingFood) {
-            return res.status(404).json({ message: "Me ID eken food item ekak naha!" });
+            return res.status(404).json({ message: "No food item was found for the provided ID." });
         }
 
         // 3. Image — new file upload naththam existing path keep
@@ -193,12 +193,12 @@ exports.updateFood = async (req, res) => {
 
         // 8. Success response
         res.json({
-            message: "Food item eka update una! ✅",
+            message: "Food item updated successfully.",
             food: updatedFood
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Food item update weddi server eke aulk aawa." });
+        res.status(500).json({ message: "A server error occurred while updating the food item." });
     }
 };
 
@@ -212,17 +212,17 @@ exports.deleteFood = async (req, res) => {
         // 1. Food find + validate
         const food = await Food.findById(req.params.id);
         if (!food) {
-            return res.status(404).json({ message: "Me ID eken food item ekak naha!" });
+            return res.status(404).json({ message: "No food item was found for the provided ID." });
         }
 
         // 2. Delete
         await Food.findByIdAndDelete(req.params.id);
 
         // 3. Success
-        res.json({ message: "Food item eka delete una! 🗑️" });
+        res.json({ message: "Food item deleted successfully." });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Food item delete weddi server eke aulk aawa." });
+        res.status(500).json({ message: "A server error occurred while deleting the food item." });
     }
 };
 

@@ -20,7 +20,7 @@ exports.createOrder = async (req, res) => {
 
         // restaurantId valid ObjectId da check karanawa
         if (!restaurantId || !mongoose.Types.ObjectId.isValid(restaurantId)) {
-            return res.status(400).json({ message: 'Valid restaurantId ekak denna ona!' });
+            return res.status(400).json({ message: 'Please provide a valid restaurantId.' });
         }
 
         // items JSON string ekak widihata enna puluwan (FormData eken) — parse karanawa
@@ -28,18 +28,18 @@ exports.createOrder = async (req, res) => {
         try {
             parsedItems = typeof items === 'string' ? JSON.parse(items) : items;
         } catch {
-            return res.status(400).json({ message: 'Items eka valid JSON array ekak thiyanama ona!' });
+            return res.status(400).json({ message: 'Items must be provided as a valid JSON array.' });
         }
 
         // Items array blank da check karanawa
         if (!Array.isArray(parsedItems) || parsedItems.length === 0) {
-            return res.status(400).json({ message: 'Order eke aduth food item ekak thiyanama ona!' });
+            return res.status(400).json({ message: 'An order must contain at least one food item.' });
         }
 
         // totalAmount positive number ekak da check karanawa
         const totalNum = Number(totalAmount);
         if (isNaN(totalNum) || totalNum <= 0) {
-            return res.status(400).json({ message: 'Valid totalAmount ekak denna ona!' });
+            return res.status(400).json({ message: 'Please provide a valid totalAmount.' });
         }
 
         // Payment slip image path — Multer eken save welanam path eka gannawa
@@ -70,13 +70,13 @@ exports.createOrder = async (req, res) => {
             .populate('items.foodId', 'name price');
 
         res.status(201).json({
-            message: 'Order eka lassanata place una! 🎉',
+            message: 'Order placed successfully.',
             order: populated
         });
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Order save weddi server eke aulk aawa.' });
+        res.status(500).json({ message: 'A server error occurred while saving the order.' });
     }
 };
 
@@ -112,7 +112,7 @@ exports.getOrders = async (req, res) => {
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Orders gannata server eke aulk aawa.' });
+        res.status(500).json({ message: 'A server error occurred while retrieving orders.' });
     }
 };
 
@@ -128,12 +128,12 @@ exports.getOrderById = async (req, res) => {
         const slug = String(id).toLowerCase();
         if (slug === 'available' || slug === 'my-active-task') {
             return res.status(404).json({
-                message: `GET /api/orders/${slug} kiyana list endpoint eka use karanna — meka order-by-id naha.`,
+                message: `Use GET /api/orders/${slug} list endpoint. This route is not an order-by-id endpoint.`,
             });
         }
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ message: 'Valid order ID ekak denna!' });
+            return res.status(400).json({ message: 'Please provide a valid order ID.' });
         }
 
         const order = await Order.findById(id)
@@ -143,7 +143,7 @@ exports.getOrderById = async (req, res) => {
             .populate('items.foodId', 'name price image');
 
         if (!order) {
-            return res.status(404).json({ message: 'Me ID eken order ekak naha!' });
+            return res.status(404).json({ message: 'No order was found for the provided ID.' });
         }
 
         // Owner hari manager witharak order balanna puluwan
@@ -155,14 +155,14 @@ exports.getOrderById = async (req, res) => {
             String(order.riderId._id || order.riderId) === String(req.user.id);
 
         if (!isOwner && !isManager && !(isRider && riderMatch)) {
-            return res.status(403).json({ message: 'Oya ta me order balanna permission naha!' });
+            return res.status(403).json({ message: 'You do not have permission to view this order.' });
         }
 
         res.json(order);
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Order gannata server eke aulk aawa.' });
+        res.status(500).json({ message: 'A server error occurred while retrieving the order.' });
     }
 };
 
@@ -176,25 +176,25 @@ exports.updateOrder = async (req, res) => {
         const { id } = req.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ message: 'Valid order ID ekak denna!' });
+            return res.status(400).json({ message: 'Please provide a valid order ID.' });
         }
 
         if (req.user.role === 'manager') {
-            return res.status(403).json({ message: 'Manager la me route eken order edit karanna baha!' });
+            return res.status(403).json({ message: 'Managers are not allowed to edit orders through this route.' });
         }
 
         const order = await Order.findById(id);
         if (!order) {
-            return res.status(404).json({ message: 'Me ID eken order ekak naha!' });
+            return res.status(404).json({ message: 'No order was found for the provided ID.' });
         }
 
         if (String(order.userId) !== String(req.user.id)) {
-            return res.status(403).json({ message: 'Oya ta me order edit karanna permission naha!' });
+            return res.status(403).json({ message: 'You do not have permission to edit this order.' });
         }
 
         if (order.status !== 'Pending') {
             return res.status(400).json({
-                message: `Order eka '${order.status}' stage eke thiyenawa. Dan edit karanna baha!`
+                message: `This order is currently in '${order.status}' status and can no longer be edited.`
             });
         }
 
@@ -204,16 +204,16 @@ exports.updateOrder = async (req, res) => {
         try {
             parsedItems = typeof items === 'string' ? JSON.parse(items) : items;
         } catch {
-            return res.status(400).json({ message: 'Items eka valid JSON array ekak thiyanama ona!' });
+            return res.status(400).json({ message: 'Items must be provided as a valid JSON array.' });
         }
 
         if (!Array.isArray(parsedItems) || parsedItems.length === 0) {
-            return res.status(400).json({ message: 'Order eke aduth food item ekak thiyanama ona!' });
+            return res.status(400).json({ message: 'An order must contain at least one food item.' });
         }
 
         const totalNum = Number(totalAmount);
         if (isNaN(totalNum) || totalNum <= 0) {
-            return res.status(400).json({ message: 'Valid totalAmount ekak denna ona!' });
+            return res.status(400).json({ message: 'Please provide a valid totalAmount.' });
         }
 
         order.items = parsedItems;
@@ -232,12 +232,12 @@ exports.updateOrder = async (req, res) => {
             .populate('items.foodId', 'name price image');
 
         res.json({
-            message: 'Order eka update una! ✅',
+            message: 'Order updated successfully.',
             order: populated
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Order update weddi server eke aulk aawa.' });
+        res.status(500).json({ message: 'A server error occurred while updating the order.' });
     }
 };
 
@@ -261,7 +261,7 @@ async function populateOrderDoc(query) {
 exports.getAvailableOrders = async (req, res) => {
     try {
         if (req.user.role !== 'rider') {
-            return res.status(403).json({ message: 'Me endpoint eka rider kenek witharak!' });
+            return res.status(403).json({ message: 'This endpoint is accessible to riders only.' });
         }
 
         // Ready + rider assign nathi: null (schema default) hari field eka nathi purana documents
@@ -276,7 +276,7 @@ exports.getAvailableOrders = async (req, res) => {
         return res.status(200).json(list);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Available orders gannata server eke aulk aawa.' });
+        res.status(500).json({ message: 'A server error occurred while retrieving available orders.' });
     }
 };
 
@@ -287,12 +287,12 @@ exports.getRiderActiveTask = deliveryController.getActiveDeliveryTask;
 exports.assignRider = async (req, res) => {
     try {
         if (req.user.role !== 'rider') {
-            return res.status(403).json({ message: 'Order assign karanna rider kenek witharak!' });
+            return res.status(403).json({ message: 'Only riders are allowed to assign orders.' });
         }
 
         const { id } = req.params;
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ message: 'Valid order ID ekak denna!' });
+            return res.status(400).json({ message: 'Please provide a valid order ID.' });
         }
 
         const riderObjectId = req.user.id || req.user._id;
@@ -302,19 +302,19 @@ exports.assignRider = async (req, res) => {
         if (!updated) {
             return res.status(400).json({
                 message:
-                    'Me order eka dan assign wela naththam Ready naha — accept karanna baha!',
+                    'This order cannot be accepted because it is either not Ready or already assigned.',
             });
         }
 
         const populated = await populateOrderDoc(Order.findById(updated._id));
 
         res.json({
-            message: 'Delivery accept una! 🛵 (Delivery DB eke record ekak create una)',
+            message: 'Delivery accepted successfully. A delivery record has been created.',
             order: populated,
         });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Assign weddi server eke aulk aawa.' });
+        res.status(500).json({ message: 'A server error occurred while assigning the order.' });
     }
 };
 
@@ -324,7 +324,7 @@ exports.assignRider = async (req, res) => {
 exports.updateDeliveryStatus = async (req, res) => {
     const { id: orderId } = req.params;
     if (!require('mongoose').Types.ObjectId.isValid(orderId)) {
-        return res.status(400).json({ message: 'Valid order ID ekak denna!' });
+        return res.status(400).json({ message: 'Please provide a valid order ID.' });
     }
     const Delivery = require('../models/Delivery');
     const rk = req.user.id || req.user._id;
@@ -335,7 +335,7 @@ exports.updateDeliveryStatus = async (req, res) => {
     }).sort({ createdAt: -1 });
 
     if (!delivery) {
-        return res.status(404).json({ message: 'Me order ekata active delivery record ekak naha!' });
+        return res.status(404).json({ message: 'No active delivery record was found for this order.' });
     }
     req.params.id = String(delivery._id);
     return deliveryController.updateDeliveryStatus(req, res);
@@ -345,7 +345,7 @@ exports.updateDeliveryStatus = async (req, res) => {
 exports.uploadProof = async (req, res) => {
     const { id: orderId } = req.params;
     if (!require('mongoose').Types.ObjectId.isValid(orderId)) {
-        return res.status(400).json({ message: 'Valid order ID ekak denna!' });
+        return res.status(400).json({ message: 'Please provide a valid order ID.' });
     }
     const Delivery = require('../models/Delivery');
     const rk = req.user.id || req.user._id;
@@ -356,7 +356,7 @@ exports.uploadProof = async (req, res) => {
     }).sort({ createdAt: -1 });
 
     if (!delivery) {
-        return res.status(404).json({ message: 'Me order ekata active delivery record ekak naha!' });
+        return res.status(404).json({ message: 'No active delivery record was found for this order.' });
     }
     req.params.id = String(delivery._id);
     if (!req.body) req.body = {};
@@ -368,7 +368,7 @@ exports.uploadProof = async (req, res) => {
 exports.cancelDelivery = async (req, res) => {
     const { id: orderId } = req.params;
     if (!require('mongoose').Types.ObjectId.isValid(orderId)) {
-        return res.status(400).json({ message: 'Valid order ID ekak denna!' });
+        return res.status(400).json({ message: 'Please provide a valid order ID.' });
     }
     const Delivery = require('../models/Delivery');
     const rk = req.user.id || req.user._id;
@@ -379,7 +379,7 @@ exports.cancelDelivery = async (req, res) => {
     }).sort({ createdAt: -1 });
 
     if (!delivery) {
-        return res.status(404).json({ message: 'Me order ekata active delivery record ekak naha!' });
+        return res.status(404).json({ message: 'No active delivery record was found for this order.' });
     }
     req.params.id = String(delivery._id);
     return deliveryController.cancelDeliveryTask(req, res);
@@ -395,12 +395,12 @@ exports.updateOrderStatus = async (req, res) => {
         const { id } = req.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ message: 'Valid order ID ekak denna!' });
+            return res.status(400).json({ message: 'Please provide a valid order ID.' });
         }
 
         // Manager witharak status wenas karanna puluwan
         if (req.user.role !== 'manager') {
-            return res.status(403).json({ message: 'Manager witharak status wenas karanna puluwan!' });
+            return res.status(403).json({ message: 'Only managers are authorized to update order status.' });
         }
 
         const { status } = req.body;
@@ -408,26 +408,26 @@ exports.updateOrderStatus = async (req, res) => {
         const validStatuses = ['Pending', 'Preparing', 'Ready'];
         if (!status || !validStatuses.includes(status)) {
             return res.status(400).json({
-                message: `Status eka valid naha! Me wage danna: ${validStatuses.join(', ')}`
+                message: `Invalid status. Allowed values: ${validStatuses.join(', ')}`
             });
         }
 
         const order = await Order.findById(id);
         if (!order) {
-            return res.status(404).json({ message: 'Me ID eken order ekak naha!' });
+            return res.status(404).json({ message: 'No order was found for the provided ID.' });
         }
 
         order.status = status;
         const updated = await order.save();
 
         res.json({
-            message: `Order status eka '${status}' ekata update una! ✅`,
+            message: `Order status updated successfully to '${status}'.`,
             order: updated
         });
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Status update weddi server eke aulk aawa.' });
+        res.status(500).json({ message: 'A server error occurred while updating order status.' });
     }
 };
 
@@ -444,36 +444,36 @@ exports.deleteOrder = async (req, res) => {
         const { id } = req.params;
 
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ message: 'Valid order ID ekak denna!' });
+            return res.status(400).json({ message: 'Please provide a valid order ID.' });
         }
 
         const order = await Order.findById(id);
         if (!order) {
-            return res.status(404).json({ message: 'Me ID eken order ekak naha!' });
+            return res.status(404).json({ message: 'No order was found for the provided ID.' });
         }
 
         const isOwner  = String(order.userId) === String(req.user.id);
         const isManager = req.user.role === 'manager';
 
         if (!isOwner && !isManager) {
-            return res.status(403).json({ message: 'Oya ta me order cancel karanna permission naha!' });
+            return res.status(403).json({ message: 'You do not have permission to cancel this order.' });
         }
 
         // Customer kenek ta Pending witharak cancel karanna puluwan
         // Preparing / Ready — cancel karanna dena naha (manager witharak okke delete karanna puluwan)
         if (isOwner && !isManager && order.status !== 'Pending') {
             return res.status(400).json({
-                message: `Order eka '${order.status}' stage eke thiyenawa. Dan cancel karanna baha!`
+                message: `This order is currently in '${order.status}' status and can no longer be cancelled.`
             });
         }
 
         await Order.findByIdAndDelete(id);
 
-        res.json({ message: 'Order eka cancel una! 🗑️' });
+        res.json({ message: 'Order cancelled successfully.' });
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: 'Order delete weddi server eke aulk aawa.' });
+        res.status(500).json({ message: 'A server error occurred while deleting the order.' });
     }
 };
 

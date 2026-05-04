@@ -243,7 +243,7 @@ export default function OrdersScreen() {
             setEditModalVisible(false);
             setEditingOrderId(null);
             await loadOrders(); // Refresh list
-            Alert.alert('Done', data.message || 'Order updated successfully.');
+            Alert.alert('Success', data.message || 'Order updated successfully.');
         } catch (e) {
             console.error(e);
             Alert.alert('Error', e?.message || 'Network error');
@@ -292,7 +292,7 @@ export default function OrdersScreen() {
             const data = await res.json().catch(() => ({}));
             if (!res.ok) { Alert.alert('Cancel Failed', data.message || `Error ${res.status}`); return; }
             await loadOrders();
-            Alert.alert('Done', data.message || 'Order cancelled successfully.');
+            Alert.alert('Success', data.message || 'Order cancelled successfully.');
         } catch (e) {
             console.error(e);
             Alert.alert('Error', e?.message || 'Network error');

@@ -194,7 +194,7 @@ export default function ReviewScreen() {
         }
 
         if (rating === 0) {
-            Alert.alert('Validation', 'Star rating ekak select karanna (1-5)!');
+            Alert.alert('Validation', 'Please select a star rating between 1 and 5.');
             return;
         }
 
@@ -230,7 +230,7 @@ export default function ReviewScreen() {
                 return;
             }
 
-            Alert.alert('Success', data.message || 'Feedback submitted successfully! ⭐');
+            Alert.alert('Success', data.message || 'Feedback submitted successfully.');
             setRating(0);
             setComment('');
             setImage(null);
@@ -263,7 +263,7 @@ export default function ReviewScreen() {
                             return;
                         }
                                 Alert.alert('Deleted', 'Review deleted successfully.');
-                        loadReviews();
+                      
                     } catch (e) {
                         console.error(e);
                         Alert.alert('Error', e?.message || 'Network error');
@@ -308,7 +308,7 @@ export default function ReviewScreen() {
                         )}
                         <Text style={styles.label}>Your rating</Text>
                         <View style={styles.starsRow}>
-                            {[1, 2, 3, 4, 5].map((star) => (
+                            {[1, 2, 3, 4, 5,].map((star) => (
                                 <TouchableOpacity
                                     key={star}
                                     style={[styles.starBtn, rating >= star && styles.starBtnActive]}

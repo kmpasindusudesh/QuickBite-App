@@ -161,7 +161,7 @@ export default function ManagerDashboardScreen() {
             setOrders((prev) =>
                 prev.map((o) => (String(o._id) === String(orderId) ? { ...o, status: 'Ready' } : o))
             );
-            Alert.alert('Done', data.message || 'Order marked as Ready! 🍽️');
+            Alert.alert('Success', data.message || 'The order has been marked as Ready.');
         } catch (e) {
             console.error(e);
             Alert.alert('Error', e?.message || 'Network error');
@@ -195,7 +195,7 @@ export default function ManagerDashboardScreen() {
             setOrders((prev) =>
                 prev.map((o) => (String(o._id) === String(orderId) ? { ...o, status: 'Preparing' } : o))
             );
-            Alert.alert('Done', data.message || 'Order is now being prepared! 👨‍🍳');
+            Alert.alert('Success', data.message || 'The order status has been updated to Preparing.');
         } catch (e) {
             console.error(e);
             Alert.alert('Error', e?.message || 'Network error');

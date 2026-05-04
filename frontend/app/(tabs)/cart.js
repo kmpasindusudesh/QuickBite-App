@@ -213,7 +213,7 @@ export default function CartScreen() {
             setCartItems([]);
             setSlipUri(null);
 
-            Alert.alert('Order Placed! 🎉', data.message || 'Your order has been placed successfully!', [
+            Alert.alert('Order Placed', data.message || 'Your order has been placed successfully.', [
                 { text: 'OK', onPress: () => router.replace('/home') },
             ]);
         } catch (e) {

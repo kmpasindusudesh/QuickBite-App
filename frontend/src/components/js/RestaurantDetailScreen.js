@@ -118,7 +118,7 @@ export default function RestaurantDetailScreen() {
             }
 
             await saveCart(cart);
-            Alert.alert('Added to Cart', `"${item.name}" has been added to your cart. 🛒`);
+            Alert.alert('Added to Cart', `"${item.name}" has been added to your cart successfully.`);
         } catch (e) {
             console.error('Add to cart error:', e);
             Alert.alert('Error', 'Failed to add item to cart. Please try again.');

@@ -192,7 +192,7 @@ export default function RiderDashboardScreen() {
                 Alert.alert('Accept Failed', data.message || `Error ${res.status}`);
                 return;
             }
-            Alert.alert('Accepted! 🛵', data.message || 'Delivery accepted successfully.');
+            Alert.alert('Delivery Accepted', data.message || 'The delivery has been accepted successfully.');
             await refreshAll();
             setActiveTab('active');
         } catch (e) {
@@ -265,7 +265,7 @@ export default function RiderDashboardScreen() {
                 Alert.alert('Upload Failed', data.message || `Error ${res.status}`);
                 return;
             }
-            Alert.alert('Delivered! ✅', data.message || 'Order marked as delivered successfully.');
+            Alert.alert('Delivery Completed', data.message || 'The order has been marked as delivered successfully.');
             await refreshAll();
         } catch (e) {
             console.error(e);

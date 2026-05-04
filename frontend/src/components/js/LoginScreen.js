@@ -88,7 +88,7 @@ export default function LoginScreen() {
                         : String(fetchError);
                 console.error('[Login] Fetch failed:', fetchError);
                 setErrorMsg(msg);
-                Alert.alert('Login — Network / Fetch Error', msg);
+                Alert.alert('Network Error', msg);
                 return;
             }
 
@@ -107,10 +107,10 @@ export default function LoginScreen() {
                             parseErr?.message != null
                                 ? String(parseErr.message)
                                 : String(parseErr);
-                        const fullMsg = `Status ${response.status}. JSON parse fail: ${parseMsg}\nBody start: ${preview}...`;
+                        const fullMsg = `Status ${response.status}. Unable to parse the server response: ${parseMsg}\nResponse preview: ${preview}...`;
                         console.error('[Login] Not JSON body:', rawText);
                         setErrorMsg(fullMsg);
-                        Alert.alert('Login — Response not JSON', fullMsg);
+                        Alert.alert('Response Format Error', fullMsg);
                         return;
                     }
                 }
@@ -121,7 +121,7 @@ export default function LoginScreen() {
                         : String(readError);
                 console.error('[Login] Read body failed:', readError);
                 setErrorMsg(msg);
-                Alert.alert('Login — Read response failed', msg);
+                Alert.alert('Response Read Error', msg);
                 return;
             }
 
@@ -129,7 +129,7 @@ export default function LoginScreen() {
                 // HTTP error (400, 401, 500) — server eken JSON message eka thiyenawa usually
                 const serverMsg = data.message || `HTTP ${response.status}`;
                 setErrorMsg(serverMsg);
-                Alert.alert('Login — Server replied error', serverMsg);
+                Alert.alert('Login Failed', serverMsg);
                 return;
             }
 
@@ -153,7 +153,7 @@ export default function LoginScreen() {
                 error?.message != null ? String(error.message) : String(error);
             console.error('[Login] Unexpected:', error);
             setErrorMsg(msg);
-            Alert.alert('Login — Unexpected error', msg);
+            Alert.alert('Unexpected Error', msg);
         } finally {
             setIsLoading(false);
         }
@@ -185,12 +185,12 @@ export default function LoginScreen() {
                                 <Ionicons name="fast-food" size={38} color="#FFFFFF" />
                             </View>
                             <Text style={styles.appName}>QuickBite</Text>
-                            <Text style={styles.appTagline}>Fast food, delivered faster 🚀</Text>
+                            <Text style={styles.appTagline}>Fast and reliable food delivery.</Text>
                         </View>
 
                         {/* ---- Form Card ---- */}
                         <View style={styles.formCard}>
-                            <Text style={styles.formTitle}>Welcome Back!</Text>
+                            <Text style={styles.formTitle}>Welcome Back</Text>
 
                             {/* ---- Error Message Box ---- */}
                             {/* errorMsg thiyanam witharak pennawa */}

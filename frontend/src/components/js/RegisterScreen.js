@@ -122,7 +122,7 @@ export default function RegisterScreen() {
 
             // Alert ekak pennawa - user ta confirm wenawa
             Alert.alert(
-                'Success! 🎉',
+                'Registration Successful',
                 'Your account has been created successfully. Please log in to continue.',
                 [
                     {

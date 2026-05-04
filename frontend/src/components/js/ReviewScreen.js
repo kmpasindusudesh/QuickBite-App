@@ -148,6 +148,10 @@ export default function ReviewScreen() {
             setEditModalError('Please select a rating between 1 and 5.');
             return;
         }
+        if (!editModalComment.trim()) {
+            setEditModalError('Comment is required.');
+            return;
+        }
 
         setEditSaving(true);
         try {
@@ -195,6 +199,10 @@ export default function ReviewScreen() {
 
         if (rating === 0) {
             Alert.alert('Validation', 'Please select a star rating between 1 and 5.');
+            return;
+        }
+        if (!comment.trim()) {
+            Alert.alert('Validation', 'Comment is required.');
             return;
         }
 

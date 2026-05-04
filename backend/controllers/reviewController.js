@@ -81,6 +81,10 @@ exports.createReview = async (req, res) => {
             return res.status(400).json({ message: 'Rating must be between 1 and 5.' });
         }
 
+        if (!comment || String(comment).trim() === '') {
+            return res.status(400).json({ message: 'Comment is required.' });
+        }
+
         // 3. foodId optional handling
         let foodIdToSave;
         const hasFood = foodId != null && String(foodId).trim() !== '';
@@ -175,6 +179,12 @@ exports.updateReview = async (req, res) => {
             return res.status(400).json({ message: 'Rating must be between 1 and 5.' });
         }
 
+        const nextComment =
+            comment !== undefined ? String(comment).trim() : String(review.comment || '').trim();
+        if (nextComment === '') {
+            return res.status(400).json({ message: 'Comment is required.' });
+        }
+
         // 6. Image — new file upload naththam existing image path keep
         let imagePath = review.image;
         if (req.file) {
@@ -184,7 +194,7 @@ exports.updateReview = async (req, res) => {
         // 7. Update fields
         const updatedFields = {
             rating:  ratingNum,
-            comment: comment !== undefined ? String(comment).trim() : review.comment,
+            comment: nextComment,
             image:   imagePath,
         };
 

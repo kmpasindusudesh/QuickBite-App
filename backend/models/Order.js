@@ -17,13 +17,13 @@ const orderItemSchema = new mongoose.Schema(
         foodId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Food',
-            required: [true, 'foodId eka denna ona!']
+            required: [true, 'Food ID is required!']
         },
         // Ganna quantity eka — aduth 1 thiyanama ona
         quantity: {
             type: Number,
-            required: [true, 'Quantity eka denna ona!'],
-            min: [1, 'Quantity eka aduth 1 thiyanama ona!']
+            required: [true, 'Quantity is required!'],
+            min: [1, 'Quantity must be at least 1!']
         }
     },
     { _id: false } // Sub-document walata wena _id naha — clean
@@ -38,14 +38,14 @@ const orderSchema = new mongoose.Schema(
         userId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
-            required: [true, 'userId eka thiyanama ona!']
+            required: [true, 'User ID is required!']
         },
 
         // Koheda order karuwa da — Restaurant model ekata link (Member 2)
         restaurantId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Restaurant',
-            required: [true, 'restaurantId eka thiyanama ona!']
+            required: [true, 'Restaurant ID is required!']
         },
 
         // Food items array — godak items thiyana puluwan
@@ -53,15 +53,15 @@ const orderSchema = new mongoose.Schema(
             type: [orderItemSchema],
             validate: {
                 validator: (arr) => Array.isArray(arr) && arr.length > 0,
-                message: 'Order eke aduth food item ekak thiyanama ona!'
+                message: 'An order must contain at least one food item!'
             }
         },
 
         // Mulu bill eka (LKR)
         totalAmount: {
             type: Number,
-            required: [true, 'totalAmount eka denna ona!'],
-            min: [0, 'totalAmount eka 0 witharak thiyana baha!']
+            required: [true, 'Total amount is required!'],
+            min: [0, 'Total amount cannot be negative!']
         },
 
         // Order eke giya paar — kitchen → Ready → rider (Picked Up / On the Way) → Delivered
@@ -70,7 +70,7 @@ const orderSchema = new mongoose.Schema(
             enum: {
                 values: ['Pending', 'Preparing', 'Ready', 'Picked Up', 'On the Way', 'Delivered'],
                 message:
-                    'Status eka Pending, Preparing, Ready, Picked Up, On the Way, hari Delivered witharak thiyana puluwan!'
+                    'Status must be one of: Pending, Preparing, Ready, Picked Up, On the Way, or Delivered!'
             },
             default: 'Pending'
         },
@@ -92,7 +92,7 @@ const orderSchema = new mongoose.Schema(
         // Eg: 'uploads/slips/slip-1712345678901.jpg'
         paymentSlip: {
             type: String,
-            default: '' // Slip nadda blank string — required naha
+            required: [true, 'Payment Slip Required']  // Slip nadda blank string — required naha
         }
     },
     {

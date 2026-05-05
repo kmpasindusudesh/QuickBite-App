@@ -1,19 +1,3 @@
-// =====================================================
-// Delivery.js — Member 5: Delivery Task Schema (Blueprint)
-// MongoDB eke 'deliveries' collection eke document structure define karanawa
-//
-// IMPORTANT: Me collection eka Order collection ekata WENAMA (independent)
-// Rider kenekage delivery tasks okkoma me ekata save wenawa
-//
-// Me model:
-//   Rider  → Available orders accept karanawa → Delivery create wenawa
-//   Rider  → Status update: Assigned → Picked Up → On the Way → Delivered
-//   Rider  → Proof photo upload → Delivered mark wenawa
-//   Rider  → Cancel → Delivery delete; Order pool ekata return
-//
-// deliveryController.js eken okkoma operations handle wenawa
-// =====================================================
-
 // mongoose — Schema + Model + indexes
 const mongoose = require('mongoose');
 

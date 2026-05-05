@@ -156,9 +156,7 @@ export default function RiderDashboardScreen() {
     };
 
     // ── CREATE — Accept delivery ──────────────────────────────────────────────
-    // Database eke 'deliveries' collection eka hadila nathi nisa saha ID eka pass wena widiha
-    // weradi nisa eka fix kala. Dan button eka weda karanna ona.
-    const acceptDelivery = async (orderId) => {
+       const acceptDelivery = async (orderId) => {
         // Guard: orderId undefined / empty unoth backend ekata yanna epa
         if (!orderId) {
             console.warn('[acceptDelivery] orderId is undefined or empty — button pressed too early?');
@@ -656,3 +654,7 @@ const localStyles = StyleSheet.create({
         fontWeight: '700',
     },
 });
+
+
+
+

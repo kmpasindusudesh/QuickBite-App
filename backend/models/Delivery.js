@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 
 // =====================================================
-// Delivery Schema — eka delivery task eke fields define
+// Delivery Schma — eka delivery task eke fields define
 // =====================================================
 const deliverySchema = new mongoose.Schema(
     {

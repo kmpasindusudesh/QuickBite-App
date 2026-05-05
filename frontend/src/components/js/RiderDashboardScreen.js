@@ -583,7 +583,7 @@ export default function RiderDashboardScreen() {
     );
 }
 
-// ── Local styles ──────────────────────────────────────────────────────────────
+// ── Local styles ─────────────────────────────────────────────────────────────
 const localStyles = StyleSheet.create({
     badge: {
         paddingHorizontal: 10,

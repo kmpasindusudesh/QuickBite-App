@@ -213,7 +213,7 @@ exports.updateDeliveryStatus = async (req, res) => {
 
 // =====================================================
 // DELETE — DELETE /api/deliveries/:id
-// Rider cancel (Assigned hari Picked Up witharak) → Delivery doc delete, Order reset to Ready
+// Rider cance (Assigned hari Picked Up witharak) → Delivery doc delete, Order reset to Ready
 // =====================================================
 exports.cancelDeliveryTask = async (req, res) => {
     try {

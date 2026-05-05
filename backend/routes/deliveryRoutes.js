@@ -87,7 +87,7 @@ module.exports = router;
  *   Accept → 'Assigned' → 'Picked Up' → 'On the Way' → 'Delivered'
  *   Cancel → DELETE (Assigned/Picked Up only; On the Way baha)
  *
- * Multer:
+ * Multer
  *   deliveryUpload.single('deliveryProof')
  *   Field name 'deliveryProof' — frontend FormData match karanawa
  *   Delivered status walata proof required — controller validate

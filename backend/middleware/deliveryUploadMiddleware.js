@@ -3,7 +3,7 @@ const path = require('path');
 const fs = require('fs');
 
 // =====================================================
-// Delivery proof photo — uploads/delivery/ (Member 5)
+// Delivery proof photo  uploads/delivery/ (Member 5)
 // Field name: deliveryProof
 // =====================================================
 const uploadDir = path.join(__dirname, '..', 'uploads', 'delivery');

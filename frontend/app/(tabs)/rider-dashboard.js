@@ -16,7 +16,7 @@
 //               "Complete Delivery" → PUT /api/deliveries/:id (FormData: status + photo)
 //               "Cancel"          → DELETE /api/deliveries/:id
 //
-// Tab visibility: Rider witharak (isRider = true → href: '/rider-dashboard')
+// Tab visibiity: Rider witharak (isRider = true → href: '/rider-dashboard')
 // =====================================================
 import RiderDashboardScreen from '../../src/components/js/RiderDashboardScreen';
 export default RiderDashboardScreen;
